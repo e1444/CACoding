@@ -1,6 +1,8 @@
 package view;
 
 import interface_adapter.clear_users.ClearController;
+import interface_adapter.clear_users.ClearState;
+import interface_adapter.clear_users.ClearViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupState;
 import interface_adapter.signup.SignupViewModel;
@@ -22,6 +24,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
     private final JPasswordField passwordInputField = new JPasswordField(15);
     private final JPasswordField repeatPasswordInputField = new JPasswordField(15);
     private final SignupController signupController;
+    private final ClearViewModel clearViewModel;
     private final ClearController clearController;
 
     private final JButton signUp;
@@ -29,11 +32,13 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
 
     private final JButton clear;
 
-    public SignupView(ClearController clearController, SignupController signupController, SignupViewModel signupViewModel) {
-        this.clearController = clearController;
+    public SignupView(SignupController signupController, SignupViewModel signupViewModel, ClearController clearController, ClearViewModel clearViewModel) {
         this.signupController = signupController;
         this.signupViewModel = signupViewModel;
         signupViewModel.addPropertyChangeListener(this);
+        this.clearController = clearController;
+        this.clearViewModel = clearViewModel;
+        clearViewModel.addPropertyChangeListener(this);
 
         JLabel title = new JLabel(SignupViewModel.TITLE_LABEL);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -72,7 +77,6 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
 
         clear.addActionListener(
                 new ActionListener() {
-                    @Override
                     public void actionPerformed(ActionEvent evt) {
                         if (evt.getSource().equals(clear)) {
                             clearController.execute();
@@ -166,9 +170,17 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        SignupState state = (SignupState) evt.getNewValue();
-        if (state.getUsernameError() != null) {
-            JOptionPane.showMessageDialog(this, state.getUsernameError());
+        if (evt.getNewValue() instanceof SignupState) {
+            SignupState state = (SignupState) evt.getNewValue();
+            if (state.getUsernameError() != null) {
+                JOptionPane.showMessageDialog(this, state.getUsernameError());
+            }
+        }
+        else if (evt.getNewValue() instanceof ClearState) {
+            ClearState state = (ClearState) evt.getNewValue();
+            if (!state.getUsersRemoved().isEmpty()) {
+                JOptionPane.showMessageDialog(this, state.getUsersRemoved());
+            }
         }
     }
 }

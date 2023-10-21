@@ -21,6 +21,18 @@ public class ClearPresenter implements ClearOutputBoundary {
     @Override
     public void prepareSuccessView(ClearOutputData response) {
         // On success switch to the signup view
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (String str : response.getUsersRemoved()) {
+            stringBuilder.append(str).append("\n");
+        }
+
+        String result = stringBuilder.toString();
+        ClearState clearState = clearViewModel.getState();
+        clearState.setUsersRemoved(result);
+        clearViewModel.setState(clearState);
+
+        clearViewModel.firePropertyChanged();
         viewManagerModel.setActiveView(signupViewModel.getViewName());
         viewManagerModel.firePropertyChanged();
     }

@@ -8,10 +8,7 @@ import use_case.clear_users.ClearUserDataAccessInterface;
 
 import java.io.*;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class FileUserDataAccessObject implements SignupUserDataAccessInterface, LoginUserDataAccessInterface, ClearUserDataAccessInterface {
 
@@ -99,11 +96,15 @@ public class FileUserDataAccessObject implements SignupUserDataAccessInterface, 
     }
 
     @Override
-    public void deleteAll() {
+    public List<String> deleteAll() {
         try {
             FileWriter fileWriter = new FileWriter(csvFile, false); // Set the second parameter to 'false' to overwrite the file
             fileWriter.write(""); // Write an empty string to clear the file
             fileWriter.close();
+
+            List<String> usersRemoved = new ArrayList<>(accounts.keySet());
+            accounts.clear();
+            return usersRemoved;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
